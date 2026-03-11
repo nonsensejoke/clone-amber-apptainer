@@ -1,0 +1,54 @@
+BootStrap: docker
+From: ubuntu:22.04
+Stage: compile
+
+%files
+pmemd24.tar.bz2 /opt
+
+%post 
+export DEBIAN_FRONTEND=noninteractive
+apt update && apt-get install -y csh flex bison patch gcc gfortran g++ make \
+                       build-essential xorg-dev xutils-dev libbz2-dev zlib1g-dev \
+                       libboost-dev libboost-thread-dev libboost-system-dev mpich libmpich-dev \
+                       python3 wget bc cmake git  doxygen libfftw3-dev automake lsb-core  && apt clean
+cd /opt
+
+
+
+#wget https://repo.anaconda.com/miniconda/Miniconda3-py310_23.11.0-2-Linux-x86_64.sh -O miniconda.sh && \
+#    bash miniconda.sh -b -p "/opt/miniconda" && \
+#    rm -f miniconda.sh && \
+#    mkdir /.conda &&  chmod -R 777 /.conda
+#export PATH="/opt/miniconda/bin:${PATH}"
+#conda install -y numpy scipy pytest swig cython pip matplotlib && chmod -R 777 /opt
+
+#export PYTHON_LIBRARIES=/opt/miniconda/lib
+#export PYTHON_INCLUDE_DIRS=/opt/miniconda/include
+
+#compiling pmemd24 GPU
+tar -xjf ./pmemd24.tar.bz2
+rm -f ./pmemd24.tar.bz2
+cd pmemd24_src
+cd build/
+sed -i -e "s/CUDA=TRUE/CUDA=FALSE/" run_cmake
+sed -i -e 's/DOWNLOAD_MINICONDA=TRUE/DOWNLOAD_MINICONDA=FALSE/g' run_cmake
+sed -i -e "s/MPI=FALSE/MPI=TRUE/" run_cmake
+./run_cmake
+make -j2 install 
+
+#compiling pmemd24 GPU MPI
+#./clean_build
+#sed -i -e "s/MPI=FALSE/MPI=TRUE/" run_cmake
+#./run_cmake
+#make install
+
+cd /opt
+rm -rf pmemd24_src
+
+%environment
+
+#export PATH="/opt/miniconda/bin:${PATH}"
+#export CUDA_HOME=/usr/local/cuda/
+export AMBERHOME=/opt/pmemd24/
+export PATH="$AMBERHOME/bin:$PATH"
+export LD_LIBRARY_PATH="$AMBERHOME/lib:$LD_LIBRARY_PATH"
