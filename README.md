@@ -30,6 +30,15 @@ Where `...` are the options.
 
 You can also add that line to submission script similar to pmemd24.sh example in this repo.
 
+```
+bash ../serial-run-v6.sh -e 'singularity exec --nv --cleanenv /path/to/pmemd24_gpu-smaller.sif pmemd' -p aaa.parm7 -c   aaa.rst7 -o md-test-1 
+```
+
+``` 
+bash ../serial-run-v6.sh -e 'singularity exec --nv --cleanenv /path/to/pmemd24_cpuMPI.sif mpirun -np 2 pmemd.MPI' -p bbb.parm7 -c   bbb.rst7 -o md-test-2 
+```
+
+
 # Example
 Get the amber benchmark files:
 ```
